@@ -129,6 +129,7 @@ android {
     }
 
     defaultConfig {
+        missingDimensionStrategy 'react-native-camera', 'general'
         applicationId "com.components"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -180,10 +181,11 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-image-picker')
     implementation project(':react-native-config')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
+    implementation project(':react-native-camera')
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")

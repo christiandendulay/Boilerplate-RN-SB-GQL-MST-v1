@@ -8,6 +8,8 @@ import { BookModel, BookModelType } from "./BookModel"
 import { bookModelPrimitives, BookModelSelector } from "./BookModel.base"
 import { UserModel, UserModelType } from "./UserModel"
 import { userModelPrimitives, UserModelSelector } from "./UserModel.base"
+import { FileModel, FileModelType } from "./FileModel"
+import { fileModelPrimitives, FileModelSelector } from "./FileModel.base"
 
 
 /**
@@ -15,7 +17,7 @@ import { userModelPrimitives, UserModelSelector } from "./UserModel.base"
 */
 export const RootStoreBase = MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['Book', () => BookModel], ['User', () => UserModel]], ['Book', 'User']))
+  .extend(configureStoreMixin([['Book', () => BookModel], ['User', () => UserModel], ['File', () => FileModel]], ['Book', 'User']))
   .props({
     books: types.optional(types.map(types.late(() => BookModel)), {}),
     users: types.optional(types.map(types.late(() => UserModel)), {})
@@ -59,6 +61,11 @@ export const RootStoreBase = MSTGQLStore
     mutateUserCheckin(variables: { id: string }, resultSelector: string | ((qb: UserModelSelector) => UserModelSelector) = userModelPrimitives.toString(), optimisticUpdate?: () => void) {
       return self.mutate<{ userCheckin: UserModelType}>(`mutation userCheckin($id: ID!) { userCheckin(id: $id) {
         ${typeof resultSelector === "function" ? resultSelector(new UserModelSelector()).toString() : resultSelector}
+      } }`, variables, optimisticUpdate)
+    },
+    mutateUploadFile(variables: { file: any }, resultSelector: string | ((qb: FileModelSelector) => FileModelSelector) = fileModelPrimitives.toString(), optimisticUpdate?: () => void) {
+      return self.mutate<{ uploadFile: FileModelType}>(`mutation uploadFile($file: Upload!) { uploadFile(file: $file) {
+        ${typeof resultSelector === "function" ? resultSelector(new FileModelSelector()).toString() : resultSelector}
       } }`, variables, optimisticUpdate)
     },
   }))

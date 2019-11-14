@@ -4,5 +4,6 @@
 
 export * from "./BookModel"
 export * from "./UserModel"
+export * from "./FileModel"
 export * from "./RootStore"
 export * from "./reactUtils"

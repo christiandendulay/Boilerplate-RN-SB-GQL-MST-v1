@@ -1,5 +1,13 @@
 import { gql } from "apollo-server";
-
+import {
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  createReadStream,
+  fstat,
+  writeFile
+} from "fs";
+import path from "path";
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
@@ -24,9 +32,15 @@ const typeDefs = gql`
   # The "Query" type is special: it lists all of the available queries that
   # clients can execute, along with the return type for each. In this
   # case, the "books" query returns an array of zero or more Books (defined above).
+
   type Query {
     books: [Book]
     users: [User]
+    files: [String]
+  }
+
+  type File {
+    file: String
   }
 
   type Mutation {
@@ -36,13 +50,17 @@ const typeDefs = gql`
     checkin(id: ID, checkin: Boolean): [Book]
     createUser(name: String): User
     userCheckin(id: ID!): User
+    uploadFile(file: Upload!): File
   }
 `;
-
+const files = [];
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
+    files: () => {
+      return files;
+    },
     books: async (_, __, { Book }) => {
       const books = Book.find();
       return books;
@@ -85,8 +103,23 @@ const resolvers = {
         { new: true }
       );
       return updatedUser;
+    },
+    uploadFile: async (_, { file }) => {
+      const { fileName } = await file;
+
+      writeFile(
+        path.join(__dirname, "../images", fileName),
+        file.data,
+        { encoding: "base64" },
+        function(err) {
+          console.log(err);
+        }
+      );
+
+      return fileName;
     }
   }
 };
-
+existsSync(path.join(__dirname, "../images")) ||
+  mkdirSync(path.join(__dirname, "../images"));
 export { typeDefs, resolvers };
